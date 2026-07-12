@@ -60,21 +60,21 @@ fn main() {
         .end();
 
     // 4. Compile the Model with an Optimizer
-    // let mut model = Model::compile(g, SGD::new(0.01));
+    let mut model = Model::compile(g, SGD::new(0.01));
     
     // ... Provide data and execute ...
-    // let input_data = ArrayD::from_elem(IxDyn(&[1, 2]), 1.0);
-    // model.set_input(x, input_data);
+    let input_data = ArrayD::from_elem(IxDyn(&[1, 2]), 1.0);
+    model.set_input(x, input_data);
     
     // Forward pass to compute 'y'
-    // model.forward(y);
-    // println!("Output: {:?}", model.value(y));
+    model.forward(y);
+    println!("Output: {:?}", model.value(y));
     
     // Backward pass to compute gradients w.r.t 'y'
-    // model.backward(y);
+    model.backward(y);
     
     // Update weights
-    // model.optimizer_step();
+    model.optimizer_step();
 }
 ```
 
