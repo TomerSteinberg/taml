@@ -153,7 +153,9 @@ impl Graph {
         if let Some(init) = &meta.init {
             Some(init(&meta.shape))
         } else {
-            self.default_init.as_ref().map(|default| default(&meta.shape))
+            self.default_init
+                .as_ref()
+                .map(|default| default(&meta.shape))
         }
     }
 
