@@ -1,6 +1,8 @@
 use ndarray::{ArrayD, Ix2, IxDyn};
 use ndarray::linalg::Dot;
 
+use std::fmt;
+
 #[derive(Debug)]
 pub enum Op {
     Add,
@@ -14,6 +16,24 @@ pub enum Op {
     Pow(f64),
     Sum,
     Mean,
+}
+
+impl fmt::Display for Op {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Op::Add => write!(f, "add"),
+            Op::Sub => write!(f, "sub"),
+            Op::Mul => write!(f, "mul"),
+            Op::Div => write!(f, "div"),
+            Op::MatMul => write!(f, "matmul"),
+            Op::Neg => write!(f, "neg"),
+            Op::Exp => write!(f, "exp"),
+            Op::ReLU => write!(f, "relu"),
+            Op::Pow(_) => write!(f, "pow"),
+            Op::Sum => write!(f, "sum"),
+            Op::Mean => write!(f, "mean"),
+        }
+    }
 }
 
 impl Op {
