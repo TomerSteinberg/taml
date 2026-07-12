@@ -1,11 +1,10 @@
-use ndarray::{ArrayD, IxDyn};
 use crate::chain::Chain;
 use crate::initializer::{ConstInit, VarInit};
 use crate::ops::Op;
+use ndarray::{ArrayD, IxDyn};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct NodeId(pub usize);
-
 
 pub struct Graph {
     pub(crate) nodes: Vec<Node>,
@@ -32,7 +31,10 @@ pub(crate) struct VarMeta {
 
 impl Graph {
     pub fn new() -> Self {
-        Graph { nodes: Vec::new(), default_init: None }
+        Graph {
+            nodes: Vec::new(),
+            default_init: None,
+        }
     }
 
     /// Set a default initializer for all Var nodes that don't have an explicit one.
@@ -76,18 +78,40 @@ impl Graph {
         self.push_node(NodeKind::Op(op), inputs)
     }
 
-    pub fn add(&mut self, node_a: NodeId, node_b: NodeId) -> NodeId { self.op(Op::Add, &[node_a, node_b]) }
-    pub fn sub(&mut self, node_a: NodeId, node_b: NodeId) -> NodeId { self.op(Op::Sub, &[node_a, node_b]) }
-    pub fn mul(&mut self, node_a: NodeId, node_b: NodeId) -> NodeId { self.op(Op::Mul, &[node_a, node_b]) }
-    pub fn div(&mut self, node_a: NodeId, node_b: NodeId) -> NodeId { self.op(Op::Div, &[node_a, node_b]) }
-    pub fn matmul(&mut self, node_a: NodeId, node_b: NodeId) -> NodeId { self.op(Op::MatMul, &[node_a, node_b]) }
-    pub fn neg(&mut self, node: NodeId) -> NodeId { self.op(Op::Neg, &[node]) }
-    pub fn relu(&mut self, node: NodeId) -> NodeId { self.op(Op::ReLU, &[node]) }
-    pub fn exp(&mut self, node: NodeId) -> NodeId { self.op(Op::Exp, &[node]) }
-    pub fn pow(&mut self, node: NodeId, exp: f64) -> NodeId { self.op(Op::Pow(exp), &[node]) }
-    pub fn sum(&mut self, node: NodeId) -> NodeId { self.op(Op::Sum, &[node]) }
-    pub fn mean(&mut self, node: NodeId) -> NodeId { self.op(Op::Mean, &[node]) }
-    
+    pub fn add(&mut self, node_a: NodeId, node_b: NodeId) -> NodeId {
+        self.op(Op::Add, &[node_a, node_b])
+    }
+    pub fn sub(&mut self, node_a: NodeId, node_b: NodeId) -> NodeId {
+        self.op(Op::Sub, &[node_a, node_b])
+    }
+    pub fn mul(&mut self, node_a: NodeId, node_b: NodeId) -> NodeId {
+        self.op(Op::Mul, &[node_a, node_b])
+    }
+    pub fn div(&mut self, node_a: NodeId, node_b: NodeId) -> NodeId {
+        self.op(Op::Div, &[node_a, node_b])
+    }
+    pub fn matmul(&mut self, node_a: NodeId, node_b: NodeId) -> NodeId {
+        self.op(Op::MatMul, &[node_a, node_b])
+    }
+    pub fn neg(&mut self, node: NodeId) -> NodeId {
+        self.op(Op::Neg, &[node])
+    }
+    pub fn relu(&mut self, node: NodeId) -> NodeId {
+        self.op(Op::ReLU, &[node])
+    }
+    pub fn exp(&mut self, node: NodeId) -> NodeId {
+        self.op(Op::Exp, &[node])
+    }
+    pub fn pow(&mut self, node: NodeId, exp: f64) -> NodeId {
+        self.op(Op::Pow(exp), &[node])
+    }
+    pub fn sum(&mut self, node: NodeId) -> NodeId {
+        self.op(Op::Sum, &[node])
+    }
+    pub fn mean(&mut self, node: NodeId) -> NodeId {
+        self.op(Op::Mean, &[node])
+    }
+
     /// Start a left-to-right chain from `start`.
     /// Each method adds an op node; `.end()` returns the final NodeId.
     ///
@@ -95,7 +119,10 @@ impl Graph {
     /// let y = g.chain(x).matmul(w).add(b).relu().end();
     /// ```
     pub fn chain(&mut self, start: NodeId) -> Chain<'_> {
-        Chain { graph: self, prev: start }
+        Chain {
+            graph: self,
+            prev: start,
+        }
     }
 
     /// Set a human-readable name for a node.
@@ -151,7 +178,8 @@ impl Graph {
         self.nodes.push(Node {
             name: Some(name),
             kind,
-            inputs: inputs.to_vec() });
+            inputs: inputs.to_vec(),
+        });
         id
     }
 

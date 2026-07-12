@@ -1,6 +1,6 @@
 use ndarray::{ArrayD, IxDyn};
-use taml::graph::{Graph};
 use taml::context::ExecutionContext;
+use taml::graph::Graph;
 use taml::initializer;
 
 fn arr1(data: &[f64]) -> ArrayD<f64> {
@@ -162,7 +162,10 @@ fn backward_matmul_graph() {
 
     let mut ctx = ExecutionContext::new(&g);
     ctx.set_var(w, initializer::ones()(&[3, 2]));
-    ctx.set_input(x, ArrayD::from_shape_vec(IxDyn(&[1, 3]), vec![2.0, 3.0, 4.0]).unwrap());
+    ctx.set_input(
+        x,
+        ArrayD::from_shape_vec(IxDyn(&[1, 3]), vec![2.0, 3.0, 4.0]).unwrap(),
+    );
     ctx.forward(&g, loss);
     ctx.backward(&g, loss);
 

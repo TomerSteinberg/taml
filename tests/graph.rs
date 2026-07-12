@@ -1,5 +1,5 @@
 use ndarray::{ArrayD, IxDyn};
-use taml::graph::{Graph};
+use taml::graph::Graph;
 use taml::initializer;
 // =========================================================================
 // Graph construction
@@ -137,8 +137,18 @@ fn default_init_applies_to_all_vars() {
     let a = g.variable(&[2, 3]);
     let b = g.variable(&[4]);
     let ctx = taml::context::ExecutionContext::new(&g);
-    assert!(ctx.value(a).unwrap().iter().all(|&x| (x - 1.0).abs() < 1e-10));
-    assert!(ctx.value(b).unwrap().iter().all(|&x| (x - 1.0).abs() < 1e-10));
+    assert!(
+        ctx.value(a)
+            .unwrap()
+            .iter()
+            .all(|&x| (x - 1.0).abs() < 1e-10)
+    );
+    assert!(
+        ctx.value(b)
+            .unwrap()
+            .iter()
+            .all(|&x| (x - 1.0).abs() < 1e-10)
+    );
 }
 
 #[test]

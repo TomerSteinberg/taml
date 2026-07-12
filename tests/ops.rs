@@ -130,28 +130,40 @@ fn compute_mean() {
 
 #[test]
 fn backward_add() {
-    let grads = Op::Add.backward(&[&arr1(&[1.0, 2.0]), &arr1(&[3.0, 4.0])], &arr1(&[2.0, 5.0]));
+    let grads = Op::Add.backward(
+        &[&arr1(&[1.0, 2.0]), &arr1(&[3.0, 4.0])],
+        &arr1(&[2.0, 5.0]),
+    );
     approx_eq(grads[0].as_slice().unwrap(), &[2.0, 5.0]);
     approx_eq(grads[1].as_slice().unwrap(), &[2.0, 5.0]);
 }
 
 #[test]
 fn backward_sub() {
-    let grads = Op::Sub.backward(&[&arr1(&[5.0, 7.0]), &arr1(&[4.0, 5.0])], &arr1(&[1.0, 1.0]));
+    let grads = Op::Sub.backward(
+        &[&arr1(&[5.0, 7.0]), &arr1(&[4.0, 5.0])],
+        &arr1(&[1.0, 1.0]),
+    );
     approx_eq(grads[0].as_slice().unwrap(), &[1.0, 1.0]);
     approx_eq(grads[1].as_slice().unwrap(), &[-1.0, -1.0]);
 }
 
 #[test]
 fn backward_mul() {
-    let grads = Op::Mul.backward(&[&arr1(&[2.0, 3.0]), &arr1(&[5.0, 6.0])], &arr1(&[1.0, 1.0]));
+    let grads = Op::Mul.backward(
+        &[&arr1(&[2.0, 3.0]), &arr1(&[5.0, 6.0])],
+        &arr1(&[1.0, 1.0]),
+    );
     approx_eq(grads[0].as_slice().unwrap(), &[5.0, 6.0]);
     approx_eq(grads[1].as_slice().unwrap(), &[2.0, 3.0]);
 }
 
 #[test]
 fn backward_div() {
-    let grads = Op::Div.backward(&[&arr1(&[10.0, 18.0]), &arr1(&[2.0, 3.0])], &arr1(&[1.0, 1.0]));
+    let grads = Op::Div.backward(
+        &[&arr1(&[10.0, 18.0]), &arr1(&[2.0, 3.0])],
+        &arr1(&[1.0, 1.0]),
+    );
     approx_eq(grads[0].as_slice().unwrap(), &[0.5, 1.0 / 3.0]);
     approx_eq(grads[1].as_slice().unwrap(), &[-2.5, -2.0]);
 }
@@ -214,8 +226,14 @@ fn backward_matmul_non_square() {
     let b = arr2(&[7.0, 8.0, 9.0, 10.0, 11.0, 12.0], 3, 2);
     let grad = arr2(&[1.0, 1.0, 1.0, 1.0], 2, 2);
     let grads = Op::MatMul.backward(&[&a, &b], &grad);
-    approx_eq(grads[0].as_slice().unwrap(), &[15.0, 19.0, 23.0, 15.0, 19.0, 23.0]);
-    approx_eq(grads[1].as_slice().unwrap(), &[5.0, 5.0, 7.0, 7.0, 9.0, 9.0]);
+    approx_eq(
+        grads[0].as_slice().unwrap(),
+        &[15.0, 19.0, 23.0, 15.0, 19.0, 23.0],
+    );
+    approx_eq(
+        grads[1].as_slice().unwrap(),
+        &[5.0, 5.0, 7.0, 7.0, 9.0, 9.0],
+    );
 }
 
 #[test]
@@ -233,7 +251,10 @@ fn backward_sum_scaled() {
 #[test]
 fn backward_mean() {
     let grads = Op::Mean.backward(&[&arr1(&[1.0, 2.0, 3.0])], &arr1(&[1.0]));
-    approx_eq(grads[0].as_slice().unwrap(), &[1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0]);
+    approx_eq(
+        grads[0].as_slice().unwrap(),
+        &[1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0],
+    );
 }
 
 #[test]

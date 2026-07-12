@@ -1,5 +1,5 @@
-use ndarray::ArrayD;
 use crate::graph::{Graph, NodeId, NodeKind};
+use ndarray::ArrayD;
 
 /// Holds runtime values and gradients for every node in a Graph.
 ///
@@ -32,7 +32,6 @@ impl ExecutionContext {
         ExecutionContext { values, grads }
     }
 
-
     /// Set the value of an Input node (must be called before `forward`).
     pub fn set_input(&mut self, node: NodeId, value: ArrayD<f64>) {
         self.values[node.0] = Some(value);
@@ -42,7 +41,6 @@ impl ExecutionContext {
     pub fn set_var(&mut self, node: NodeId, value: ArrayD<f64>) {
         self.values[node.0] = Some(value);
     }
-
 
     /// Compute the value of `node` and all its ancestors by traversing
     /// the graph in topological order (inputs before outputs).
@@ -144,12 +142,7 @@ pub(crate) fn topological_forward_order(graph: &Graph, root: NodeId) -> Vec<Node
     order
 }
 
-fn dfs_visit(
-    graph: &Graph,
-    node: NodeId,
-    visited: &mut Vec<bool>,
-    order: &mut Vec<NodeId>,
-) {
+fn dfs_visit(graph: &Graph, node: NodeId, visited: &mut Vec<bool>, order: &mut Vec<NodeId>) {
     if visited[node.0] {
         return;
     }

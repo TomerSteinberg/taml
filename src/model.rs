@@ -1,7 +1,7 @@
-use ndarray::ArrayD;
-use crate::graph::{Graph, NodeId};
 use crate::context::ExecutionContext;
+use crate::graph::{Graph, NodeId};
 use crate::optimizer::Optimizer;
+use ndarray::ArrayD;
 
 /// A compiled model bundles a Graph blueprint with its ExecutionContext
 /// and an Optimizer.
@@ -21,9 +21,13 @@ impl Model {
     /// and stores the optimizer for later `optimizer_step()` calls.
     pub fn compile(graph: Graph, optimizer: impl Optimizer + 'static) -> Self {
         let ctx = ExecutionContext::new(&graph);
-        Model { graph, context: ctx, optimizer: Box::new(optimizer) }
+        Model {
+            graph,
+            context: ctx,
+            optimizer: Box::new(optimizer),
+        }
     }
-    
+
     pub fn set_input(&mut self, node: NodeId, value: ArrayD<f64>) {
         self.context.set_input(node, value);
     }
@@ -31,7 +35,7 @@ impl Model {
     pub fn set_var(&mut self, node: NodeId, value: ArrayD<f64>) {
         self.context.set_var(node, value);
     }
-    
+
     pub fn forward(&mut self, node: NodeId) {
         self.context.forward(&self.graph, node);
     }
@@ -47,7 +51,7 @@ impl Model {
     pub fn optimizer_step(&mut self) {
         self.optimizer.step(&self.graph, &mut self.context);
     }
-    
+
     pub fn value(&self, node: NodeId) -> Option<&ArrayD<f64>> {
         self.context.value(node)
     }
@@ -55,7 +59,7 @@ impl Model {
     pub fn grad(&self, node: NodeId) -> Option<&ArrayD<f64>> {
         self.context.grad(node)
     }
-    
+
     /// Set an input, run forward on `output`, and return the result.
     pub fn predict(&mut self, input: NodeId, output: NodeId, data: ArrayD<f64>) -> ArrayD<f64> {
         self.set_input(input, data);

@@ -70,8 +70,14 @@ fn matmul_backward_non_square() {
     let grad_a = model.grad(a).unwrap();
     let grad_b = model.grad(b).unwrap();
 
-    approx_eq(grad_a.as_slice().unwrap(), &[3.75, 4.75, 5.75, 3.75, 4.75, 5.75]);
-    approx_eq(grad_b.as_slice().unwrap(), &[1.25, 1.25, 1.75, 1.75, 2.25, 2.25]);
+    approx_eq(
+        grad_a.as_slice().unwrap(),
+        &[3.75, 4.75, 5.75, 3.75, 4.75, 5.75],
+    );
+    approx_eq(
+        grad_b.as_slice().unwrap(),
+        &[1.25, 1.25, 1.75, 1.75, 2.25, 2.25],
+    );
 }
 
 // ---------------------------------------------------------------------------
@@ -138,8 +144,14 @@ fn unreachable_node_has_no_gradient() {
     assert!(model.grad(c).is_some());
     // a and b were not visited during backward (not ancestors of loss)
     // so their gradients should be None
-    assert!(model.grad(a).is_none(), "disconnected node a should have no gradient");
-    assert!(model.grad(b).is_none(), "disconnected node b should have no gradient");
+    assert!(
+        model.grad(a).is_none(),
+        "disconnected node a should have no gradient"
+    );
+    assert!(
+        model.grad(b).is_none(),
+        "disconnected node b should have no gradient"
+    );
 }
 
 // ---------------------------------------------------------------------------
@@ -211,7 +223,10 @@ fn deep_linear_chain_forward() {
     // f(0) = 3 * exp(2 * exp(0)) = 3 * exp(2 * 1) = 3 * exp(2) = 3 * 7.389...
     let expected = 3.0 * std::f64::consts::E * std::f64::consts::E;
     let actual = model.value(y).unwrap().as_slice().unwrap()[0];
-    assert!((actual - expected).abs() < 1e-10, "expected {expected}, got {actual}");
+    assert!(
+        (actual - expected).abs() < 1e-10,
+        "expected {expected}, got {actual}"
+    );
 }
 
 // ---------------------------------------------------------------------------

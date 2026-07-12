@@ -61,7 +61,12 @@ fn linear_regression_converges() {
 
         // loss should be non-increasing (this is SGD on convex problem)
         // Allow tiny numerical increases
-        assert!(total_loss <= prev_loss + 1e-12, "loss increased: {:.10} -> {:.10}", prev_loss, total_loss);
+        assert!(
+            total_loss <= prev_loss + 1e-12,
+            "loss increased: {:.10} -> {:.10}",
+            prev_loss,
+            total_loss
+        );
         prev_loss = total_loss;
     }
 
@@ -71,6 +76,16 @@ fn linear_regression_converges() {
     // Parameters should be close to true values
     let w_val = model.value(w).unwrap().as_slice().unwrap()[0];
     let b_val = model.value(b).unwrap().as_slice().unwrap()[0];
-    assert!((w_val - true_w).abs() < 0.2, "w={:.4} (expected {})", w_val, true_w);
-    assert!((b_val - true_b).abs() < 0.2, "b={:.4} (expected {})", b_val, true_b);
+    assert!(
+        (w_val - true_w).abs() < 0.2,
+        "w={:.4} (expected {})",
+        w_val,
+        true_w
+    );
+    assert!(
+        (b_val - true_b).abs() < 0.2,
+        "b={:.4} (expected {})",
+        b_val,
+        true_b
+    );
 }

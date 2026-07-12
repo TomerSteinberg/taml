@@ -1,5 +1,5 @@
 use ndarray::{ArrayD, IxDyn};
-use taml::graph::{Graph};
+use taml::graph::Graph;
 use taml::initializer;
 use taml::model::Model;
 use taml::optimizer::SGD;
@@ -20,17 +20,23 @@ fn chain_builder_reads_left_to_right() {
     //   g.add(g.matmul(x, w), b)
 
     // With chain (linear style):
-    let y = g.chain(x)
-        .matmul(w)
-        .add(b)
-        .end();
+    let y = g.chain(x).matmul(w).add(b).end();
 
     let mut model = Model::compile(g, SGD::new(0.01));
-    model.set_var(w, ArrayD::from_shape_vec(IxDyn(&[3, 2]), vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0]).unwrap());
-    model.set_var(b, ArrayD::from_shape_vec(IxDyn(&[2]), vec![0.1, 0.2]).unwrap());
+    model.set_var(
+        w,
+        ArrayD::from_shape_vec(IxDyn(&[3, 2]), vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0]).unwrap(),
+    );
+    model.set_var(
+        b,
+        ArrayD::from_shape_vec(IxDyn(&[2]), vec![0.1, 0.2]).unwrap(),
+    );
 
     // Input must be 2D for matmul: [1, 3] x [3, 2] = [1, 2]
-    model.set_input(x, ArrayD::from_shape_vec(IxDyn(&[1, 3]), vec![2.0, 3.0, 4.0]).unwrap());
+    model.set_input(
+        x,
+        ArrayD::from_shape_vec(IxDyn(&[1, 3]), vec![2.0, 3.0, 4.0]).unwrap(),
+    );
     model.forward(y);
 
     // Manual: [2,3,4] . [[1,2],[3,4],[5,6]] = [31, 40]; + [0.1, 0.2] = [31.1, 40.2]
@@ -134,9 +140,21 @@ fn gradient_accumulates_across_branches() {
     let grad_b = model.grad(b).unwrap().as_slice().unwrap()[0];
     let grad_c = model.grad(c).unwrap().as_slice().unwrap()[0];
 
-    assert!((grad_a - 6.0).abs() < 1e-10, "d(loss)/da = {}, expected 6", grad_a);
-    assert!((grad_b - 3.0).abs() < 1e-10, "d(loss)/db = {}, expected 3", grad_b);
-    assert!((grad_c - 3.0).abs() < 1e-10, "d(loss)/dc = {}, expected 3", grad_c);
+    assert!(
+        (grad_a - 6.0).abs() < 1e-10,
+        "d(loss)/da = {}, expected 6",
+        grad_a
+    );
+    assert!(
+        (grad_b - 3.0).abs() < 1e-10,
+        "d(loss)/db = {}, expected 3",
+        grad_b
+    );
+    assert!(
+        (grad_c - 3.0).abs() < 1e-10,
+        "d(loss)/dc = {}, expected 3",
+        grad_c
+    );
 }
 
 // ---------------------------------------------------------------------------

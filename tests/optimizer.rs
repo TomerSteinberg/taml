@@ -1,7 +1,7 @@
 use ndarray::{ArrayD, IxDyn};
-use taml::graph::Graph;
 use taml::context::ExecutionContext;
-use taml::optimizer::{SGD, Optimizer};
+use taml::graph::Graph;
+use taml::optimizer::{Optimizer, SGD};
 
 fn arr1(data: &[f64]) -> ArrayD<f64> {
     ArrayD::from_shape_vec(IxDyn(&[data.len()]), data.to_vec()).unwrap()

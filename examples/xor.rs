@@ -1,5 +1,5 @@
 use ndarray::{ArrayD, IxDyn};
-use taml::graph::{Graph};
+use taml::graph::Graph;
 use taml::initializer;
 use taml::model::Model;
 use taml::optimizer::SGD;
@@ -48,7 +48,7 @@ fn main() {
 
     const EPOCHS: u32 = 10_000;
 
-    for epoch in 0.. EPOCHS {
+    for epoch in 0..EPOCHS {
         let mut total_loss = 0.0;
 
         for (xv, yv) in &data {
@@ -81,7 +81,10 @@ fn main() {
         let pass = (pred > 0.5) == (*yv > 0.5);
         println!(
             "  {} XOR {} = {:.4}  (expected {:.0}, {})",
-            xv[0] as u8, xv[1] as u8, pred, yv,
+            xv[0] as u8,
+            xv[1] as u8,
+            pred,
+            yv,
             if pass { "PASS" } else { "FAIL" }
         );
     }

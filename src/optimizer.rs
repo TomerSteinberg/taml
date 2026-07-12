@@ -1,5 +1,5 @@
-use crate::graph::{Graph, NodeKind, NodeId};
 use crate::context::ExecutionContext;
+use crate::graph::{Graph, NodeId, NodeKind};
 
 /// An optimizer updates trainable variables using their accumulated gradients.
 pub trait Optimizer {
