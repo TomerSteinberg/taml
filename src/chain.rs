@@ -1,3 +1,5 @@
+#![allow(clippy::should_implement_trait)]
+
 use crate::graph::{Graph, NodeId};
 use crate::ops::Op;
 
