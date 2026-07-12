@@ -1,6 +1,6 @@
 # TAML(L) - Tomer's Amazing Machine Learning Library
 
-[![Build Status](https://github.com/TomerSteinberg/taml-rs/actions/workflows/taml.yml/badge.svg)](https://github.com/TomerSteinberg/taml-rs/actions/workflows/taml.yml)
+[![Build Status](https://github.com/TomerSteinberg/taml-rs/actions/workflows/taml.yml/badge.svg)](https://github.com/TomerSteinberg/taml/actions/workflows/taml.yml)
 [![Rust 2024](https://img.shields.io/badge/Rust-2024-blue.svg)](https://blog.rust-lang.org/)
 
 **TAML** is a lightweight, graph-based Automatic Differentiation and Machine Learning library written in Rust. Developed primarily as a learning project to deepen the understanding of Automatic Differentiation, backward propagation, and computational graphs, TAML is designed to be intuitive, clean, and extensible.

@@ -1,11 +1,11 @@
 [package]
 name = "taml-rs"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 authors = ["Tomer Steinberg"]
 description = "A lightweight, n-dimensional automatic differentiation library for learning and experimentation."
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/TomerSteinberg/taml-rs"
+repository = "https://github.com/TomerSteinberg/taml"
 readme = "README.md"
 categories = ["science", "mathematics"]
 keywords = ["machine-learning", "autodiff", "tensor"]
