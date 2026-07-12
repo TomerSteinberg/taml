@@ -1,4 +1,4 @@
-//! # taml - Tomer's Amazing Machine Learning Library
+//! # taml(l) - Tomer's Amazing Machine Learning Library
 //!
 //! A lightweight, n-dimensional automatic differentiation library for learning and experimentation.
 //! `taml` provides a dynamic computation graph, backpropagation, and basic optimizers (like SGD)
