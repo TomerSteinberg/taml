@@ -1,4 +1,4 @@
-# TAML - Tomer's Amazing Machine Learning Library
+# TAML(L) - Tomer's Amazing Machine Learning Library
 
 [![Build Status](https://github.com/TomerSteinberg/taml/actions/workflows/taml.yml/badge.svg)](https://github.com/TomerSteinberg/taml/actions/workflows/taml.yml)
 [![Rust 2024](https://img.shields.io/badge/Rust-2024-blue.svg)](https://blog.rust-lang.org/)
@@ -22,7 +22,12 @@ To use TAML in your Rust project, add it to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-taml = { path = "path/to/taml" } # Or published version if available
+taml = "0.1.0"
+```
+
+Or just run:
+```bash
+cargo add taml
 ```
 
 > **Note**: TAML requires the Rust 2024 edition.

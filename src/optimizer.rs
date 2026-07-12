@@ -10,11 +10,14 @@ pub trait Optimizer {
     fn step(&mut self, graph: &Graph, ctx: &mut ExecutionContext);
 }
 
+/// Stochastic Gradient Descent optimizer.
 pub struct SGD {
+    /// The learning rate step size.
     pub learning_rate: f64,
 }
 
 impl SGD {
+    /// Create a new SGD optimizer with the given learning rate.
     pub fn new(learning_rate: f64) -> Self {
         SGD { learning_rate }
     }

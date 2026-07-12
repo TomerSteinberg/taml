@@ -3,18 +3,30 @@ use ndarray::{ArrayD, Ix2, IxDyn};
 
 use std::fmt;
 
+/// Mathematical operations supported by the computation graph.
 #[derive(Debug)]
 pub enum Op {
+    /// Addition
     Add,
+    /// Multiplication
     Mul,
+    /// Matrix multiplication
     MatMul,
+    /// Exponential
     Exp,
+    /// Rectified Linear Unit
     ReLU,
+    /// Subtraction
     Sub,
+    /// Negation
     Neg,
+    /// Division
     Div,
+    /// Power
     Pow(f64),
+    /// Sum reduction
     Sum,
+    /// Mean reduction
     Mean,
 }
 
@@ -37,6 +49,7 @@ impl fmt::Display for Op {
 }
 
 impl Op {
+    /// Compute the forward pass for this operation.
     pub fn compute(&self, inputs: &[&ArrayD<f64>]) -> ArrayD<f64> {
         match self {
             Op::MatMul => {
@@ -72,6 +85,7 @@ impl Op {
         }
     }
 
+    /// Compute the backward pass for this operation, returning gradients for inputs.
     pub fn backward(&self, inputs: &[&ArrayD<f64>], gradient: &ArrayD<f64>) -> Vec<ArrayD<f64>> {
         match self {
             Op::MatMul => {

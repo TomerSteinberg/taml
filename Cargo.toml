@@ -2,6 +2,13 @@
 name = "taml"
 version = "0.1.0"
 edition = "2024"
+authors = ["Tomer Steinberg"]
+description = "A lightweight, n-dimensional automatic differentiation library for learning and experimentation."
+license = "MIT"
+repository = "https://github.com/TomerSteinberg/taml"
+readme = "README.md"
+categories = ["science", "mathematics"]
+keywords = ["machine-learning", "autodiff", "tensor"]
 
 [dependencies]
 ndarray = "0.17.2"

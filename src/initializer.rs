@@ -7,6 +7,7 @@ pub type VarInit = Box<dyn Fn(&[usize]) -> ArrayD<f64>>;
 /// Self-contained producer of an ArrayD. Used for constants.
 pub type ConstInit = Box<dyn Fn() -> ArrayD<f64>>;
 
+/// Creates a Glorot (Xavier) uniform initializer for variables.
 pub fn glorot_uniform() -> VarInit {
     const GLOROT_UNIFORM_SCALE_FACTOR: f64 = 6.0;
     Box::new(|shape: &[usize]| {
@@ -19,18 +20,22 @@ pub fn glorot_uniform() -> VarInit {
     })
 }
 
+/// Creates a zero-filled initializer for variables.
 pub fn zeros() -> VarInit {
     Box::new(|shape: &[usize]| ArrayD::zeros(IxDyn(shape)))
 }
 
+/// Creates a one-filled initializer for variables.
 pub fn ones() -> VarInit {
     Box::new(|shape: &[usize]| ArrayD::ones(IxDyn(shape)))
 }
 
+/// Creates an initializer for a scalar constant.
 pub fn scalar(value: f64) -> ConstInit {
     Box::new(move || ArrayD::from_elem(IxDyn(&[]), value))
 }
 
+/// Creates an initializer for an arbitrary constant array.
 pub fn constant_array(data: ArrayD<f64>) -> ConstInit {
     Box::new(move || data.clone())
 }

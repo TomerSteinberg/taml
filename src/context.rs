@@ -123,10 +123,12 @@ impl ExecutionContext {
         }
     }
 
+    /// Get the computed value for a node, if any.
     pub fn value(&self, node: NodeId) -> Option<&ArrayD<f64>> {
         self.values[node.0].as_ref()
     }
 
+    /// Get the computed gradient for a node, if any.
     pub fn grad(&self, node: NodeId) -> Option<&ArrayD<f64>> {
         self.grads[node.0].as_ref()
     }

@@ -28,34 +28,42 @@ impl Model {
         }
     }
 
+    /// Set the value of an input node.
     pub fn set_input(&mut self, node: NodeId, value: ArrayD<f64>) {
         self.context.set_input(node, value);
     }
 
+    /// Set the value of a variable node.
     pub fn set_var(&mut self, node: NodeId, value: ArrayD<f64>) {
         self.context.set_var(node, value);
     }
 
+    /// Run the forward pass up to the given node.
     pub fn forward(&mut self, node: NodeId) {
         self.context.forward(&self.graph, node);
     }
 
+    /// Run the backward pass starting from the given node.
     pub fn backward(&mut self, node: NodeId) {
         self.context.backward(&self.graph, node);
     }
 
+    /// Zero out all accumulated gradients.
     pub fn zero_grad(&mut self) {
         self.context.zero_grad();
     }
 
+    /// Run one step of the optimizer to update variables.
     pub fn optimizer_step(&mut self) {
         self.optimizer.step(&self.graph, &mut self.context);
     }
 
+    /// Get the computed value for a node, if any.
     pub fn value(&self, node: NodeId) -> Option<&ArrayD<f64>> {
         self.context.value(node)
     }
 
+    /// Get the computed gradient for a node, if any.
     pub fn grad(&self, node: NodeId) -> Option<&ArrayD<f64>> {
         self.context.grad(node)
     }
@@ -77,6 +85,7 @@ impl Model {
         &self.context
     }
 
+    /// Access the underlying context mutably.
     pub fn context_mut(&mut self) -> &mut ExecutionContext {
         &mut self.context
     }

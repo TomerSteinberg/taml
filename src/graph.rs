@@ -3,9 +3,11 @@ use crate::initializer::{ConstInit, VarInit};
 use crate::ops::Op;
 use ndarray::{ArrayD, IxDyn};
 
+/// An opaque identifier for a node in the computation graph.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct NodeId(pub usize);
 
+/// The computation graph that stores the topological blueprint of the model.
 pub struct Graph {
     pub(crate) nodes: Vec<Node>,
     pub(crate) default_init: Option<VarInit>,
@@ -36,6 +38,7 @@ impl Default for Graph {
 }
 
 impl Graph {
+    /// Create a new, empty graph.
     pub fn new() -> Self {
         Graph {
             nodes: Vec::new(),
@@ -82,36 +85,47 @@ impl Graph {
         self.push_node(NodeKind::Op(op), inputs)
     }
 
+    /// Create an addition node.
     pub fn add(&mut self, node_a: NodeId, node_b: NodeId) -> NodeId {
         self.op(Op::Add, &[node_a, node_b])
     }
+    /// Create a subtraction node.
     pub fn sub(&mut self, node_a: NodeId, node_b: NodeId) -> NodeId {
         self.op(Op::Sub, &[node_a, node_b])
     }
+    /// Create a multiplication node.
     pub fn mul(&mut self, node_a: NodeId, node_b: NodeId) -> NodeId {
         self.op(Op::Mul, &[node_a, node_b])
     }
+    /// Create a division node.
     pub fn div(&mut self, node_a: NodeId, node_b: NodeId) -> NodeId {
         self.op(Op::Div, &[node_a, node_b])
     }
+    /// Create a matrix multiplication node.
     pub fn matmul(&mut self, node_a: NodeId, node_b: NodeId) -> NodeId {
         self.op(Op::MatMul, &[node_a, node_b])
     }
+    /// Create a negation node.
     pub fn neg(&mut self, node: NodeId) -> NodeId {
         self.op(Op::Neg, &[node])
     }
+    /// Create a ReLU activation node.
     pub fn relu(&mut self, node: NodeId) -> NodeId {
         self.op(Op::ReLU, &[node])
     }
+    /// Create an exponential node.
     pub fn exp(&mut self, node: NodeId) -> NodeId {
         self.op(Op::Exp, &[node])
     }
+    /// Create a power node.
     pub fn pow(&mut self, node: NodeId, exp: f64) -> NodeId {
         self.op(Op::Pow(exp), &[node])
     }
+    /// Create a sum reduction node.
     pub fn sum(&mut self, node: NodeId) -> NodeId {
         self.op(Op::Sum, &[node])
     }
+    /// Create a mean reduction node.
     pub fn mean(&mut self, node: NodeId) -> NodeId {
         self.op(Op::Mean, &[node])
     }
