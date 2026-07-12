@@ -1,0 +1,20 @@
+#!/bin/sh
+
+echo "Running pre-push checks (cargo fmt & cargo clippy)..."
+
+# Run formatting check
+echo "Running cargo fmt..."
+if ! cargo fmt -- --check; then
+    echo "Error: cargo fmt failed. Please run 'cargo fmt' to format your code."
+    exit 1
+fi
+
+# Run clippy checks
+echo "Running cargo clippy..."
+if ! cargo clippy -- -D warnings; then
+    echo "Error: cargo clippy failed. Please fix the warnings before pushing."
+    exit 1
+fi
+
+echo "All checks passed! Pushing to remote..."
+exit 0
