@@ -29,6 +29,12 @@ pub(crate) struct VarMeta {
     pub init: Option<VarInit>,
 }
 
+impl Default for Graph {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Graph {
     pub fn new() -> Self {
         Graph {
@@ -41,8 +47,6 @@ impl Graph {
     pub fn set_default_init(&mut self, init: VarInit) {
         self.default_init = Some(init);
     }
-
-    // -- node constructors ---------------------------------------------------
 
     /// Create an input placeholder node (data/target fed at runtime).
     pub fn input(&mut self) -> NodeId {
@@ -148,10 +152,8 @@ impl Graph {
     pub(crate) fn resolve_init(&self, meta: &VarMeta) -> Option<ArrayD<f64>> {
         if let Some(init) = &meta.init {
             Some(init(&meta.shape))
-        } else if let Some(default) = &self.default_init {
-            Some(default(&meta.shape))
         } else {
-            None
+            self.default_init.as_ref().map(|default| default(&meta.shape))
         }
     }
 
