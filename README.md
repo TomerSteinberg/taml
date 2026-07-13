@@ -40,8 +40,7 @@ Here is a simple example of how to construct a graph, compile a model, and run a
 use ndarray::{ArrayD, IxDyn};
 use taml::graph::Graph;
 use taml::model::Model;
-// (Assuming SGD is implemented in taml::optimizer)
-// use taml::optimizer::SGD; 
+use taml::optimizer::SGD; 
 
 fn main() {
     // 1. Initialize the Graph
