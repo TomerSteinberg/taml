@@ -98,7 +98,11 @@ impl Model {
                     parts.push("Var".into());
                     if !meta.shape.is_empty() {
                         parts.push(
-                            meta.shape.iter().map(|dim| dim.to_string()).collect::<Vec<_>>().join("×"),
+                            meta.shape
+                                .iter()
+                                .map(|dim| dim.to_string())
+                                .collect::<Vec<_>>()
+                                .join("×"),
                         );
                     }
                 }
@@ -106,10 +110,16 @@ impl Model {
             }
 
             if let Some(val) = &self.context.values[node_idx] {
-                parts.push(format!("val: {}", escape_dot_label(&fmt_array_preview(val))));
+                parts.push(format!(
+                    "val: {}",
+                    escape_dot_label(&fmt_array_preview(val))
+                ));
             }
             if let Some(grad) = &self.context.grads[node_idx] {
-                parts.push(format!("grad: {}", escape_dot_label(&fmt_array_preview(grad))));
+                parts.push(format!(
+                    "grad: {}",
+                    escape_dot_label(&fmt_array_preview(grad))
+                ));
             }
 
             let _ = writeln!(
@@ -162,7 +172,6 @@ fn escape_dot_label(label_text: &str) -> String {
     }
     out
 }
-
 
 /// Compact one-line preview of a ndarray for DOT labels.
 fn fmt_array_preview(array: &ArrayD<f64>) -> String {
