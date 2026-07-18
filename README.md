@@ -18,14 +18,8 @@ It uses `ndarray` as its sole dependency for N-dimensional tensor operations.
 
 ## Installation
 
-To use TAML in your Rust project, add it to your `Cargo.toml`:
+To use TAML in your Rust project, simply run the following command:
 
-```toml
-[dependencies]
-taml-rs = "0.1.0"
-```
-
-Or just run:
 ```bash
 cargo add taml-rs
 ```
