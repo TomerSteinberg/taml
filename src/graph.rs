@@ -14,7 +14,7 @@ pub struct Graph {
 }
 
 pub(crate) struct Node {
-    pub name: Option<String>,
+    pub name: String,
     pub kind: NodeKind,
     pub inputs: Vec<NodeId>,
 }
@@ -146,7 +146,7 @@ impl Graph {
     /// Set a human-readable name for a node.
     pub fn set_node_name(&mut self, id: NodeId, name: impl Into<String>) {
         if let Some(node) = self.nodes.get_mut(id.0) {
-            node.name = Some(name.into());
+            node.name = name.into();
         }
     }
 
@@ -160,7 +160,7 @@ impl Graph {
     /// Get the display name for a node (always available — auto-generated
     /// at construction if no explicit name was given).
     pub fn node_name(&self, id: NodeId) -> &str {
-        self.nodes[id.0].name.as_deref().unwrap()
+        &self.nodes[id.0].name
     }
 
     pub(crate) fn resolve_init(&self, meta: &VarMeta) -> Option<ArrayD<f64>> {
@@ -194,7 +194,7 @@ impl Graph {
         let id = NodeId(self.nodes.len());
         let name = self.default_name(id, &kind);
         self.nodes.push(Node {
-            name: Some(name),
+            name,
             kind,
             inputs: inputs.to_vec(),
         });
