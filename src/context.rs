@@ -137,9 +137,9 @@ impl ExecutionContext {
 /// Post-order DFS from `root`. Children (inputs) appear before their parents,
 /// so the result is a valid forward evaluation order.
 pub(crate) fn topological_forward_order(graph: &Graph, root: NodeId) -> Vec<NodeId> {
-    let n = graph.nodes.len();
-    let mut visited = vec![false; n];
-    let mut order = Vec::with_capacity(n);
+    let graph_size = graph.nodes.len();
+    let mut visited = vec![false; graph_size];
+    let mut order = Vec::with_capacity(graph_size);
     dfs_visit(graph, root, &mut visited, &mut order);
     order
 }

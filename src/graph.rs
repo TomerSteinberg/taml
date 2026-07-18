@@ -150,13 +150,6 @@ impl Graph {
         }
     }
 
-    /// Attach a name at construction time — useful inline:
-    /// `let x = g.with_name(g.input(), "x");`
-    pub fn with_name(&mut self, id: NodeId, name: impl Into<String>) -> NodeId {
-        self.set_node_name(id, name);
-        id
-    }
-
     /// Get the display name for a node (always available — auto-generated
     /// at construction if no explicit name was given).
     pub fn node_name(&self, id: NodeId) -> &str {

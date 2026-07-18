@@ -38,11 +38,13 @@ fn main() {
     let b3 = graph.variable_with(&[1], initializer::zeros());
     let z3 = graph.matmul(h2, w3);
     let y_pred = graph.add(z3, b3);
+    graph.set_node_name(y_pred, "predication");
 
     // MSE loss: mean((y_pred - y_true)^2)
     let diff = graph.sub(y_pred, y_true);
     let sq = graph.pow(diff, 2.0);
     let loss = graph.mean(sq);
+    graph.set_node_name(loss, "loss");
 
     let mut model = Model::compile(graph, SGD::new(0.01));
 
@@ -88,4 +90,7 @@ fn main() {
             if pass { "PASS" } else { "FAIL" }
         );
     }
+
+    println!("\nResult XOR model view:");
+    println!("{}", model.to_graphviz_dot());
 }
