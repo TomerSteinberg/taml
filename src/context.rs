@@ -52,16 +52,7 @@ impl ExecutionContext {
         for &node_id in &order {
             let n = &graph.nodes[node_id.0];
             if let NodeKind::Op(op) = &n.kind {
-                // Clone values to avoid aliasing borrows
-                let input_vals: Vec<ArrayD<f64>> = n
-                    .inputs
-                    .iter()
-                    .map(|&i| {
-                        self.values[i.0]
-                            .clone()
-                            .expect("forward: input has no value")
-                    })
-                    .collect();
+                let input_vals = collect_input_values(&self.values, &n.inputs);
                 let input_refs: Vec<&ArrayD<f64>> = input_vals.iter().collect();
                 self.values[node_id.0] = Some(op.compute(&input_refs));
             }
@@ -84,15 +75,7 @@ impl ExecutionContext {
         for &node_id in order.iter().rev() {
             let n = &graph.nodes[node_id.0];
             if let NodeKind::Op(op) = &n.kind {
-                let input_vals: Vec<ArrayD<f64>> = n
-                    .inputs
-                    .iter()
-                    .map(|&i| {
-                        self.values[i.0]
-                            .clone()
-                            .expect("backward: input has no value")
-                    })
-                    .collect();
+                let input_vals = collect_input_values(&self.values, &n.inputs);
                 let input_refs: Vec<&ArrayD<f64>> = input_vals.iter().collect();
 
                 let output_grad = self.grads[node_id.0]
@@ -104,11 +87,7 @@ impl ExecutionContext {
                 for (i, grad) in input_grads.into_iter().enumerate() {
                     let input_id = n.inputs[i].0;
                     match &mut self.grads[input_id] {
-                        Some(existing) => {
-                            // Accumulate gradients from multiple consumers
-                            let current = existing.clone();
-                            *existing = current + &grad;
-                        }
+                        Some(existing) => *existing += &grad,
                         None => self.grads[input_id] = Some(grad),
                     }
                 }
@@ -132,6 +111,15 @@ impl ExecutionContext {
     pub fn grad(&self, node: NodeId) -> Option<&ArrayD<f64>> {
         self.grads[node.0].as_ref()
     }
+}
+
+/// Clone input values out of the context's value store for a set of node IDs.
+/// Returns owned arrays to avoid aliasing borrows against `self`.
+fn collect_input_values(values: &[Option<ArrayD<f64>>], inputs: &[NodeId]) -> Vec<ArrayD<f64>> {
+    inputs
+        .iter()
+        .map(|&id| values[id.0].clone().expect("input has no value"))
+        .collect()
 }
 
 /// Post-order DFS from `root`. Children (inputs) appear before their parents,

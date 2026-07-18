@@ -234,7 +234,7 @@ fn set_var_overrides_initializer() {
 // =========================================================================
 
 #[test]
-#[should_panic(expected = "forward: input has no value")]
+#[should_panic(expected = "input has no value")]
 fn forward_panics_on_missing_input() {
     let mut g = Graph::new();
     let x = g.input();
