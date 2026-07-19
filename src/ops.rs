@@ -1,5 +1,5 @@
 use ndarray::linalg::Dot;
-use ndarray::{ArrayD, Ix2, IxDyn};
+use ndarray::{ArrayD, Axis, Ix2, IxDyn, Zip};
 
 use std::fmt;
 
@@ -28,6 +28,16 @@ pub enum Op {
     Sum,
     /// Mean reduction
     Mean,
+    /// Sine
+    Sin,
+    /// Cosine
+    Cos,
+    /// Tangent
+    Tan,
+    /// Square root
+    Sqrt,
+    /// Two-argument arctan (y, x)
+    Atan2,
 }
 
 impl fmt::Display for Op {
@@ -44,8 +54,33 @@ impl fmt::Display for Op {
             Op::Pow(_) => write!(f, "pow"),
             Op::Sum => write!(f, "sum"),
             Op::Mean => write!(f, "mean"),
+            Op::Sin => write!(f, "sin"),
+            Op::Cos => write!(f, "cos"),
+            Op::Tan => write!(f, "tan"),
+            Op::Sqrt => write!(f, "sqrt"),
+            Op::Atan2 => write!(f, "atan2"),
         }
     }
+}
+
+/// Reduce `grad` over any dimensions that were broadcast during the forward
+/// pass, producing a gradient whose shape matches `target`.
+///
+/// ndarray implicitly broadcasts during element-wise operations. The backward
+/// pass must undo this: wherever the target has size 1 but the gradient has
+/// a larger size, the gradient is summed along that axis.
+pub fn unbroadcast(grad: ArrayD<f64>, target: &[usize]) -> ArrayD<f64> {
+    let mut grad = grad;
+    let mut padded = target.to_vec();
+    while padded.len() < grad.ndim() {
+        padded.insert(0, 1);
+    }
+    for axis in (0..padded.len()).rev() {
+        if padded[axis] == 1 && grad.shape()[axis] > 1 {
+            grad = grad.sum_axis(Axis(axis));
+        }
+    }
+    grad.into_shape_with_order(IxDyn(target)).unwrap()
 }
 
 impl Op {
@@ -82,6 +117,18 @@ impl Op {
                 let n = inputs[0].len() as f64;
                 ArrayD::from_elem(IxDyn(&[]), sum / n)
             }
+            Op::Atan2 => {
+                let y = inputs[0];
+                let x = inputs[1];
+                Zip::from(y)
+                    .and(x)
+                    .map_collect(|&y, &x| y.atan2(x))
+                    .into_dyn()
+            }
+            Op::Sin => inputs[0].mapv(f64::sin),
+            Op::Cos => inputs[0].mapv(f64::cos),
+            Op::Tan => inputs[0].mapv(f64::tan),
+            Op::Sqrt => inputs[0].mapv(f64::sqrt),
         }
     }
 
@@ -109,18 +156,38 @@ impl Op {
 
                 vec![grad_a, grad_b]
             }
-            Op::Add => vec![gradient.clone(), gradient.clone()],
-            Op::Mul => vec![gradient * inputs[1], gradient * inputs[0]],
+            Op::Add => {
+                let grad0 = gradient.clone();
+                let grad1 = gradient.clone();
+                vec![
+                    unbroadcast(grad0, inputs[0].shape()),
+                    unbroadcast(grad1, inputs[1].shape()),
+                ]
+            }
+            Op::Mul => {
+                let grad0 = gradient * inputs[1];
+                let grad1 = gradient * inputs[0];
+                vec![
+                    unbroadcast(grad0, inputs[0].shape()),
+                    unbroadcast(grad1, inputs[1].shape()),
+                ]
+            }
             Op::Exp => vec![gradient * &inputs[0].mapv(f64::exp)],
             Op::ReLU => {
                 let mask = inputs[0].mapv(|x| if x > 0.0 { 1.0 } else { 0.0 });
                 vec![gradient * mask]
             }
-            Op::Sub => vec![gradient.clone(), -gradient],
+            Op::Sub => {
+                vec![
+                    unbroadcast(gradient.clone(), inputs[0].shape()),
+                    unbroadcast(-gradient.clone(), inputs[1].shape()),
+                ]
+            }
             Op::Neg => vec![-gradient.clone()],
             Op::Div => {
-                let grad_a = gradient / inputs[1];
-                let grad_b = gradient * &(-inputs[0] / (inputs[1] * inputs[1]));
+                let grad_a = unbroadcast(gradient / inputs[1], inputs[0].shape());
+                let raw = gradient * &(-inputs[0] / (inputs[1] * inputs[1]));
+                let grad_b = unbroadcast(raw, inputs[1].shape());
                 vec![grad_a, grad_b]
             }
             Op::Pow(n) => {
@@ -136,6 +203,27 @@ impl Op {
                 let n = inputs[0].len() as f64;
                 vec![ArrayD::from_elem(inputs[0].raw_dim(), grad_val / n)]
             }
+            Op::Atan2 => {
+                let y = inputs[0];
+                let x = inputs[1];
+                let denom = Zip::from(y).and(x).map_collect(|&y, &x| x * x + y * y);
+                let grad_y = gradient * &Zip::from(x).and(&denom).map_collect(|&x, &d| x / d);
+                let grad_x = gradient * &Zip::from(y).and(&denom).map_collect(|&y, &d| -y / d);
+                vec![
+                    unbroadcast(grad_y.into_dyn(), y.shape()),
+                    unbroadcast(grad_x.into_dyn(), x.shape()),
+                ]
+            }
+            Op::Sin => vec![gradient * &inputs[0].mapv(f64::cos)],
+            Op::Cos => vec![gradient * &inputs[0].mapv(|x| -f64::sin(x))],
+            Op::Tan => vec![
+                gradient
+                    * &inputs[0].mapv(|x| {
+                        let cos_x = f64::cos(x);
+                        1.0 / (cos_x * cos_x)
+                    }),
+            ],
+            Op::Sqrt => vec![gradient * &inputs[0].mapv(|x| 0.5 / f64::sqrt(x))],
         }
     }
 }

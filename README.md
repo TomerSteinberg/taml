@@ -18,14 +18,8 @@ It uses `ndarray` as its sole dependency for N-dimensional tensor operations.
 
 ## Installation
 
-To use TAML in your Rust project, add it to your `Cargo.toml`:
+To use TAML in your Rust project, simply run the following command:
 
-```toml
-[dependencies]
-taml-rs = "0.1.0"
-```
-
-Or just run:
 ```bash
 cargo add taml-rs
 ```
@@ -40,8 +34,7 @@ Here is a simple example of how to construct a graph, compile a model, and run a
 use ndarray::{ArrayD, IxDyn};
 use taml::graph::Graph;
 use taml::model::Model;
-// (Assuming SGD is implemented in taml::optimizer)
-// use taml::optimizer::SGD; 
+use taml::optimizer::SGD; 
 
 fn main() {
     // 1. Initialize the Graph

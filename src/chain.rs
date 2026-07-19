@@ -54,6 +54,26 @@ impl Chain<'_> {
     pub fn pow(self, n: f64) -> Self {
         self.nullary(Op::Pow(n))
     }
+    /// Adds a sine operation to the chain.
+    pub fn sin(self) -> Self {
+        self.nullary(Op::Sin)
+    }
+    /// Adds a cosine operation to the chain.
+    pub fn cos(self) -> Self {
+        self.nullary(Op::Cos)
+    }
+    /// Adds a tangent operation to the chain.
+    pub fn tan(self) -> Self {
+        self.nullary(Op::Tan)
+    }
+    /// Adds a square-root operation to the chain.
+    pub fn sqrt(self) -> Self {
+        self.nullary(Op::Sqrt)
+    }
+    /// Adds an atan2(y, x) operation to the chain (y is the chain value).
+    pub fn atan2(self, x: NodeId) -> Self {
+        self.unary(Op::Atan2, x)
+    }
 
     /// Ends the chain and returns the final node ID.
     pub fn end(self) -> NodeId {

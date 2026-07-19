@@ -110,18 +110,18 @@ fn node_name_defaults_are_unique() {
 #[test]
 fn set_node_name_overrides_default() {
     let mut g = Graph::new();
-    let node = g.input();
-    let x = g.with_name(node, "features");
+    let x = g.input();
+    g.set_node_name(x, "features");
     assert_eq!(g.node_name(x), "features");
 }
 
 #[test]
 fn with_name_chains() {
     let mut g = Graph::new();
-    let inode = g.input();
-    let x = g.with_name(inode, "x");
-    let vnode = g.variable(&[1]);
-    let w = g.with_name(vnode, "weight");
+    let x = g.input();
+    g.set_node_name(x, "x");
+    let w = g.variable(&[1]);
+    g.set_node_name(w, "weight");
     assert_eq!(g.node_name(x), "x");
     assert_eq!(g.node_name(w), "weight");
 }
