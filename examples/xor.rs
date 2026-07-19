@@ -43,8 +43,14 @@ fn main() {
         let mut total_loss = 0.0;
 
         for (xv, yv) in &data {
-            model.set_input(x, ArrayD::from_shape_vec(IxDyn(&[1, 2]), xv.to_vec()).unwrap());
-            model.set_input(y_true, ArrayD::from_shape_vec(IxDyn(&[1, 1]), vec![*yv]).unwrap());
+            model.set_input(
+                x,
+                ArrayD::from_shape_vec(IxDyn(&[1, 2]), xv.to_vec()).unwrap(),
+            );
+            model.set_input(
+                y_true,
+                ArrayD::from_shape_vec(IxDyn(&[1, 1]), vec![*yv]).unwrap(),
+            );
 
             model.forward(loss);
             total_loss += model.value(loss).unwrap().as_slice().unwrap()[0];

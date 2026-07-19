@@ -13,9 +13,18 @@ fn linear_forward_computes_xw_plus_b() {
 
     let mut model = Model::compile(g, SGD::new(0.01));
 
-    model.set_input(x, ArrayD::from_shape_vec(IxDyn(&[1, 2]), vec![1.0, 2.0]).unwrap());
-    model.set_var(w, ArrayD::from_shape_vec(IxDyn(&[2, 3]), vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0]).unwrap());
-    model.set_var(b, ArrayD::from_shape_vec(IxDyn(&[3]), vec![0.1, 0.2, 0.3]).unwrap());
+    model.set_input(
+        x,
+        ArrayD::from_shape_vec(IxDyn(&[1, 2]), vec![1.0, 2.0]).unwrap(),
+    );
+    model.set_var(
+        w,
+        ArrayD::from_shape_vec(IxDyn(&[2, 3]), vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0]).unwrap(),
+    );
+    model.set_var(
+        b,
+        ArrayD::from_shape_vec(IxDyn(&[3]), vec![0.1, 0.2, 0.3]).unwrap(),
+    );
 
     model.forward(y);
 
@@ -44,7 +53,10 @@ fn linear_forward_batch() {
         w,
         ArrayD::from_shape_vec(IxDyn(&[2, 3]), vec![1.0, 0.0, 0.0, 0.0, 1.0, 0.0]).unwrap(),
     );
-    model.set_var(b, ArrayD::from_shape_vec(IxDyn(&[3]), vec![0.5, 0.5, 0.5]).unwrap());
+    model.set_var(
+        b,
+        ArrayD::from_shape_vec(IxDyn(&[3]), vec![0.5, 0.5, 0.5]).unwrap(),
+    );
 
     model.forward(y);
 
@@ -64,12 +76,18 @@ fn linear_backward_produces_gradients() {
 
     let mut model = Model::compile(g, SGD::new(0.01));
 
-    model.set_input(x, ArrayD::from_shape_vec(IxDyn(&[1, 2]), vec![1.0, 2.0]).unwrap());
+    model.set_input(
+        x,
+        ArrayD::from_shape_vec(IxDyn(&[1, 2]), vec![1.0, 2.0]).unwrap(),
+    );
     model.set_var(
         w,
         ArrayD::from_shape_vec(IxDyn(&[2, 3]), vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0]).unwrap(),
     );
-    model.set_var(b, ArrayD::from_shape_vec(IxDyn(&[3]), vec![0.1, 0.2, 0.3]).unwrap());
+    model.set_var(
+        b,
+        ArrayD::from_shape_vec(IxDyn(&[3]), vec![0.1, 0.2, 0.3]).unwrap(),
+    );
 
     model.forward(y);
     model.backward(y);
@@ -104,7 +122,10 @@ fn linear_returns_output_weight_bias_in_order() {
 
     // All node IDs are distinct and valid
     let mut model = Model::compile(g, SGD::new(0.01));
-    model.set_input(x, ArrayD::from_shape_vec(IxDyn(&[1, 4]), vec![1.0; 4]).unwrap());
+    model.set_input(
+        x,
+        ArrayD::from_shape_vec(IxDyn(&[1, 4]), vec![1.0; 4]).unwrap(),
+    );
     model.forward(y);
     let val = model.value(y).unwrap();
     assert_eq!(val.shape(), &[1, 7]);
