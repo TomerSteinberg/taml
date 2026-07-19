@@ -40,3 +40,5 @@ pub mod model;
 pub mod ops;
 /// Optimizers for updating variables.
 pub mod optimizer;
+/// Shorthands for quick graph definition.
+pub mod layer;

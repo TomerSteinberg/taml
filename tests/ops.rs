@@ -1,5 +1,5 @@
 use ndarray::{ArrayD, IxDyn};
-use taml::ops::Op;
+use taml::ops::{unbroadcast, Op};
 
 fn arr1(data: &[f64]) -> ArrayD<f64> {
     ArrayD::from_shape_vec(IxDyn(&[data.len()]), data.to_vec()).unwrap()
@@ -261,6 +261,135 @@ fn backward_mean() {
 fn backward_mean_scaled() {
     let grads = Op::Mean.backward(&[&arr1(&[1.0, 2.0, 3.0, 4.0])], &arr1(&[2.0]));
     approx_eq(grads[0].as_slice().unwrap(), &[0.5, 0.5, 0.5, 0.5]);
+}
+
+// =========================================================================
+// unbroadcast
+// =========================================================================
+
+fn arr_1d(data: &[f64]) -> ArrayD<f64> {
+    ArrayD::from_shape_vec(IxDyn(&[data.len()]), data.to_vec()).unwrap()
+}
+
+fn arr_2d(data: &[f64], rows: usize, cols: usize) -> ArrayD<f64> {
+    ArrayD::from_shape_vec(IxDyn(&[rows, cols]), data.to_vec()).unwrap()
+}
+
+#[test]
+fn unbroadcast_same_shape_is_noop() {
+    let grad = arr_1d(&[1.0, 2.0, 3.0]);
+    let result = unbroadcast(grad.clone(), &[3]);
+    approx_eq(result.as_slice().unwrap(), &[1.0, 2.0, 3.0]);
+    assert_eq!(result.shape(), &[3]);
+}
+
+#[test]
+fn unbroadcast_bias_case() {
+    let grad = arr_2d(&[1.0, 2.0, 3.0, 4.0], 2, 2);
+    let result = unbroadcast(grad, &[2]);
+    approx_eq(result.as_slice().unwrap(), &[4.0, 6.0]);
+    assert_eq!(result.shape(), &[2]);
+}
+
+#[test]
+fn unbroadcast_1_to_3d() {
+    let grad = arr_2d(&[1.0, 2.0, 3.0, 4.0, 5.0, 6.0], 2, 3);
+    let result = unbroadcast(grad, &[1, 3]);
+    approx_eq(result.as_slice().unwrap(), &[5.0, 7.0, 9.0]);
+    assert_eq!(result.shape(), &[1, 3]);
+}
+
+#[test]
+fn unbroadcast_both_broadcast() {
+    let grad = arr_2d(&[1.0, 2.0, 3.0, 4.0, 5.0, 6.0], 2, 3);
+    let result = unbroadcast(grad, &[1, 1]);
+    assert_eq!(result.shape(), &[1, 1]);
+    approx_eq(result.as_slice().unwrap(), &[21.0]);
+}
+
+#[test]
+fn unbroadcast_scalar_target() {
+    let grad = arr_1d(&[1.0, 2.0, 3.0]);
+    let result = unbroadcast(grad, &[]);
+    assert_eq!(result.shape(), &[] as &[usize]);
+    approx_eq(result.as_slice().unwrap(), &[6.0]);
+}
+
+#[test]
+fn unbroadcast_high_rank() {
+    let grad = ArrayD::from_shape_vec(IxDyn(&[2, 3, 4]), (0..24).map(|x| x as f64).collect()).unwrap();
+    let result = unbroadcast(grad, &[1, 1, 4]);
+    assert_eq!(result.shape(), &[1, 1, 4]);
+    approx_eq(result.as_slice().unwrap(), &[60.0, 66.0, 72.0, 78.0]);
+}
+
+#[test]
+fn unbroadcast_to_scalar() {
+    let grad = ArrayD::from_elem(IxDyn(&[2, 3]), 5.0);
+    let result = unbroadcast(grad, &[]);
+    assert_eq!(result.shape(), &[] as &[usize]);
+    approx_eq(result.as_slice().unwrap(), &[30.0]);
+}
+
+// =========================================================================
+// Backward with broadcasting
+// =========================================================================
+
+#[test]
+fn backward_add_broadcast_bias() {
+    let a = arr_2d(&[1.0, 2.0, 3.0, 4.0], 2, 2); // [2, 2]
+    let b = arr_1d(&[10.0, 20.0]);                 // [2] — broadcast
+    let grads = Op::Add.backward(&[&a, &b], &arr_2d(&[1.0, 1.0, 1.0, 1.0], 2, 2));
+    assert_eq!(grads[0].shape(), &[2, 2]);
+    assert_eq!(grads[1].shape(), &[2]);
+    approx_eq(grads[0].as_slice().unwrap(), &[1.0, 1.0, 1.0, 1.0]);
+    approx_eq(grads[1].as_slice().unwrap(), &[2.0, 2.0]);
+}
+
+#[test]
+fn backward_mul_broadcast_scalar() {
+    let a = arr_2d(&[2.0, 3.0, 4.0, 5.0], 2, 2);
+    let b = arr_1d(&[10.0]);                       // [1] — broadcast
+    let grads = Op::Mul.backward(&[&a, &b], &arr_2d(&[1.0, 1.0, 1.0, 1.0], 2, 2));
+    assert_eq!(grads[0].shape(), &[2, 2]);
+    assert_eq!(grads[1].shape(), &[1]);
+    approx_eq(grads[0].as_slice().unwrap(), &[10.0; 4]);
+    approx_eq(grads[1].as_slice().unwrap(), &[14.0]); // sum of a
+}
+
+#[test]
+fn backward_add_both_broadcast() {
+    let a = arr_2d(&[1.0, 2.0, 3.0, 4.0], 1, 4); // [1, 4]
+    let b = arr_2d(&[10.0, 20.0, 30.0], 3, 1);    // [3, 1]
+    let grad_arr = arr_2d(&[1.0; 12], 3, 4);        // [3, 4]
+    let grads = Op::Add.backward(&[&a, &b], &grad_arr);
+    assert_eq!(grads[0].shape(), &[1, 4]);
+    assert_eq!(grads[1].shape(), &[3, 1]);
+    approx_eq(grads[0].as_slice().unwrap(), &[3.0, 3.0, 3.0, 3.0]);
+    approx_eq(grads[1].as_slice().unwrap(), &[4.0, 4.0, 4.0]);
+}
+
+#[test]
+fn backward_sub_broadcast_bias() {
+    let a = arr_2d(&[1.0, 2.0, 3.0, 4.0], 2, 2);
+    let b = arr_1d(&[10.0, 20.0]);
+    let grads = Op::Sub.backward(&[&a, &b], &arr_2d(&[1.0, 1.0, 1.0, 1.0], 2, 2));
+    assert_eq!(grads[0].shape(), &[2, 2]);
+    assert_eq!(grads[1].shape(), &[2]);
+    approx_eq(grads[0].as_slice().unwrap(), &[1.0; 4]);
+    approx_eq(grads[1].as_slice().unwrap(), &[-2.0, -2.0]);
+}
+
+#[test]
+fn backward_div_broadcast() {
+    let a = arr_2d(&[10.0, 20.0, 30.0, 40.0], 2, 2);
+    let b = arr_1d(&[2.0, 5.0]);
+    let grads = Op::Div.backward(&[&a, &b], &arr_2d(&[1.0, 1.0, 1.0, 1.0], 2, 2));
+    assert_eq!(grads[0].shape(), &[2, 2]);
+    assert_eq!(grads[1].shape(), &[2]);
+    // manual: grad_a = 1/b, grad_b = -a / b^2
+    approx_eq(grads[0].as_slice().unwrap(), &[0.5, 0.2, 0.5, 0.2]);
+    approx_eq(grads[1].as_slice().unwrap(), &[-10.0, -2.4]); // sum over batch
 }
 
 // =========================================================================
