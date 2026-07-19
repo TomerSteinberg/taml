@@ -120,8 +120,11 @@ impl Op {
             Op::Atan2 => {
                 let y = inputs[0];
                 let x = inputs[1];
-                Zip::from(y).and(x).map_collect(|&y, &x| y.atan2(x)).into_dyn()
-            },
+                Zip::from(y)
+                    .and(x)
+                    .map_collect(|&y, &x| y.atan2(x))
+                    .into_dyn()
+            }
             Op::Sin => inputs[0].mapv(f64::sin),
             Op::Cos => inputs[0].mapv(f64::cos),
             Op::Tan => inputs[0].mapv(f64::tan),

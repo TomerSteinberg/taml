@@ -70,6 +70,10 @@ impl Chain<'_> {
     pub fn sqrt(self) -> Self {
         self.nullary(Op::Sqrt)
     }
+    /// Adds an atan2(y, x) operation to the chain (y is the chain value).
+    pub fn atan2(self, x: NodeId) -> Self {
+        self.unary(Op::Atan2, x)
+    }
 
     /// Ends the chain and returns the final node ID.
     pub fn end(self) -> NodeId {
