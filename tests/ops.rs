@@ -1,5 +1,5 @@
 use ndarray::{ArrayD, IxDyn};
-use taml::ops::{unbroadcast, Op};
+use taml::ops::{Op, unbroadcast};
 
 fn arr1(data: &[f64]) -> ArrayD<f64> {
     ArrayD::from_shape_vec(IxDyn(&[data.len()]), data.to_vec()).unwrap()
@@ -317,7 +317,8 @@ fn unbroadcast_scalar_target() {
 
 #[test]
 fn unbroadcast_high_rank() {
-    let grad = ArrayD::from_shape_vec(IxDyn(&[2, 3, 4]), (0..24).map(|x| x as f64).collect()).unwrap();
+    let grad =
+        ArrayD::from_shape_vec(IxDyn(&[2, 3, 4]), (0..24).map(|x| x as f64).collect()).unwrap();
     let result = unbroadcast(grad, &[1, 1, 4]);
     assert_eq!(result.shape(), &[1, 1, 4]);
     approx_eq(result.as_slice().unwrap(), &[60.0, 66.0, 72.0, 78.0]);
@@ -338,7 +339,7 @@ fn unbroadcast_to_scalar() {
 #[test]
 fn backward_add_broadcast_bias() {
     let a = arr_2d(&[1.0, 2.0, 3.0, 4.0], 2, 2); // [2, 2]
-    let b = arr_1d(&[10.0, 20.0]);                 // [2] — broadcast
+    let b = arr_1d(&[10.0, 20.0]); // [2] — broadcast
     let grads = Op::Add.backward(&[&a, &b], &arr_2d(&[1.0, 1.0, 1.0, 1.0], 2, 2));
     assert_eq!(grads[0].shape(), &[2, 2]);
     assert_eq!(grads[1].shape(), &[2]);
@@ -349,7 +350,7 @@ fn backward_add_broadcast_bias() {
 #[test]
 fn backward_mul_broadcast_scalar() {
     let a = arr_2d(&[2.0, 3.0, 4.0, 5.0], 2, 2);
-    let b = arr_1d(&[10.0]);                       // [1] — broadcast
+    let b = arr_1d(&[10.0]); // [1] — broadcast
     let grads = Op::Mul.backward(&[&a, &b], &arr_2d(&[1.0, 1.0, 1.0, 1.0], 2, 2));
     assert_eq!(grads[0].shape(), &[2, 2]);
     assert_eq!(grads[1].shape(), &[1]);
@@ -360,8 +361,8 @@ fn backward_mul_broadcast_scalar() {
 #[test]
 fn backward_add_both_broadcast() {
     let a = arr_2d(&[1.0, 2.0, 3.0, 4.0], 1, 4); // [1, 4]
-    let b = arr_2d(&[10.0, 20.0, 30.0], 3, 1);    // [3, 1]
-    let grad_arr = arr_2d(&[1.0; 12], 3, 4);        // [3, 4]
+    let b = arr_2d(&[10.0, 20.0, 30.0], 3, 1); // [3, 1]
+    let grad_arr = arr_2d(&[1.0; 12], 3, 4); // [3, 4]
     let grads = Op::Add.backward(&[&a, &b], &grad_arr);
     assert_eq!(grads[0].shape(), &[1, 4]);
     assert_eq!(grads[1].shape(), &[3, 1]);
