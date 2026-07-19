@@ -28,6 +28,14 @@ pub enum Op {
     Sum,
     /// Mean reduction
     Mean,
+    /// Sine
+    Sin,
+    /// Cosine
+    Cos,
+    /// Tangent
+    Tan,
+    /// Square root
+    Sqrt,
 }
 
 impl fmt::Display for Op {
@@ -44,6 +52,10 @@ impl fmt::Display for Op {
             Op::Pow(_) => write!(f, "pow"),
             Op::Sum => write!(f, "sum"),
             Op::Mean => write!(f, "mean"),
+            Op::Sin => write!(f, "sin"),
+            Op::Cos => write!(f, "cos"),
+            Op::Tan => write!(f, "tan"),
+            Op::Sqrt => write!(f, "sqrt"),
         }
     }
 }
@@ -102,6 +114,10 @@ impl Op {
                 let n = inputs[0].len() as f64;
                 ArrayD::from_elem(IxDyn(&[]), sum / n)
             }
+            Op::Sin => inputs[0].mapv(f64::sin),
+            Op::Cos => inputs[0].mapv(f64::cos),
+            Op::Tan => inputs[0].mapv(f64::tan),
+            Op::Sqrt => inputs[0].mapv(f64::sqrt),
         }
     }
 
@@ -176,6 +192,16 @@ impl Op {
                 let n = inputs[0].len() as f64;
                 vec![ArrayD::from_elem(inputs[0].raw_dim(), grad_val / n)]
             }
+            Op::Sin => vec![gradient * &inputs[0].mapv(f64::cos)],
+            Op::Cos => vec![gradient * &inputs[0].mapv(|x| -f64::sin(x))],
+            Op::Tan => vec![
+                gradient
+                    * &inputs[0].mapv(|x| {
+                        let cos_x = f64::cos(x);
+                        1.0 / (cos_x * cos_x)
+                    }),
+            ],
+            Op::Sqrt => vec![gradient * &inputs[0].mapv(|x| 0.5 / f64::sqrt(x))],
         }
     }
 }
