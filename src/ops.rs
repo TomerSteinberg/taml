@@ -1,5 +1,5 @@
 use ndarray::linalg::Dot;
-use ndarray::{ArrayD, Axis, Ix2, IxDyn};
+use ndarray::{ArrayD, Axis, Ix2, IxDyn, Zip};
 
 use std::fmt;
 
@@ -36,6 +36,8 @@ pub enum Op {
     Tan,
     /// Square root
     Sqrt,
+    /// Two-argument arctan (y, x)
+    Atan2,
 }
 
 impl fmt::Display for Op {
@@ -56,6 +58,7 @@ impl fmt::Display for Op {
             Op::Cos => write!(f, "cos"),
             Op::Tan => write!(f, "tan"),
             Op::Sqrt => write!(f, "sqrt"),
+            Op::Atan2 => write!(f, "atan2"),
         }
     }
 }
@@ -114,6 +117,11 @@ impl Op {
                 let n = inputs[0].len() as f64;
                 ArrayD::from_elem(IxDyn(&[]), sum / n)
             }
+            Op::Atan2 => {
+                let y = inputs[0];
+                let x = inputs[1];
+                Zip::from(y).and(x).map_collect(|&y, &x| y.atan2(x)).into_dyn()
+            },
             Op::Sin => inputs[0].mapv(f64::sin),
             Op::Cos => inputs[0].mapv(f64::cos),
             Op::Tan => inputs[0].mapv(f64::tan),
@@ -191,6 +199,17 @@ impl Op {
                 let grad_val = gradient.iter().next().copied().unwrap_or(0.0);
                 let n = inputs[0].len() as f64;
                 vec![ArrayD::from_elem(inputs[0].raw_dim(), grad_val / n)]
+            }
+            Op::Atan2 => {
+                let y = inputs[0];
+                let x = inputs[1];
+                let denom = Zip::from(y).and(x).map_collect(|&y, &x| x * x + y * y);
+                let grad_y = gradient * &Zip::from(x).and(&denom).map_collect(|&x, &d| x / d);
+                let grad_x = gradient * &Zip::from(y).and(&denom).map_collect(|&y, &d| -y / d);
+                vec![
+                    unbroadcast(grad_y.into_dyn(), y.shape()),
+                    unbroadcast(grad_x.into_dyn(), x.shape()),
+                ]
             }
             Op::Sin => vec![gradient * &inputs[0].mapv(f64::cos)],
             Op::Cos => vec![gradient * &inputs[0].mapv(|x| -f64::sin(x))],
