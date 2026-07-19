@@ -129,6 +129,26 @@ impl Graph {
     pub fn mean(&mut self, node: NodeId) -> NodeId {
         self.op(Op::Mean, &[node])
     }
+    /// Create a sine node.
+    pub fn sin(&mut self, node: NodeId) -> NodeId {
+        self.op(Op::Sin, &[node])
+    }
+    /// Create a cosine node.
+    pub fn cos(&mut self, node: NodeId) -> NodeId {
+        self.op(Op::Cos, &[node])
+    }
+    /// Create a tangent node.
+    pub fn tan(&mut self, node: NodeId) -> NodeId {
+        self.op(Op::Tan, &[node])
+    }
+    /// Create a square-root node.
+    pub fn sqrt(&mut self, node: NodeId) -> NodeId {
+        self.op(Op::Sqrt, &[node])
+    }
+    /// Create an atan2(y, x) node.
+    pub fn atan2(&mut self, y: NodeId, x: NodeId) -> NodeId {
+        self.op(Op::Atan2, &[y, x])
+    }
 
     /// Start a left-to-right chain from `start`.
     /// Each method adds an op node; `.end()` returns the final NodeId.

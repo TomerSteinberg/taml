@@ -34,6 +34,8 @@ pub mod context;
 pub mod graph;
 /// Initializers for variables and constants.
 pub mod initializer;
+/// Shorthands for quick graph definition.
+pub mod layer;
 /// The high-level model API.
 pub mod model;
 /// Mathematical operations.
